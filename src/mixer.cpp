@@ -149,8 +149,13 @@ Channel *Mixer::addChannel(int type) {
 
 	if (type == CHANNEL_SAMPLE)
 		ch = new SampleChannel(bufferSize);
-	else
+	else {
+		Channel *tch;
 		ch = new MidiChannel(bufferSize);
+		// when adding channel turn off all other channel tunnelling 
+		for (unsigned i=0; i<G_Mixer.channels.size; i++) 
+			if ( (tch = G_Mixer.channels.at(i)) )  tch->tunnelIn = false;
+	}
 
 	while (true) {
 		int lockStatus = pthread_mutex_trylock(&mutex_chans);
@@ -164,6 +169,18 @@ Channel *Mixer::addChannel(int type) {
 	ch->index = getNewIndex();
 	gLog("[mixer] channel index=%d added, type=%d, total=%d\n", ch->index, ch->type, channels.size);
 	return ch;
+}
+
+
+/* ------------------------------------------------------------------ */
+
+
+void Mixer::swapMidiIn(int n) {
+
+	Channel *tch;
+	for (unsigned i=0; i<G_Mixer.channels.size; i++) 
+		if ( (tch = G_Mixer.channels.at(i)) )  tch->tunnelIn = false;
+	if( n >= 0 ) G_Mixer.channels.at(n)->tunnelIn = true;
 }
 
 
@@ -448,7 +465,7 @@ int Mixer::__masterPlay(void *out_buf, void *in_buf, unsigned bufferFrames) {
 			if (actualFrame > totalFrames) {
 				actualFrame = 0;
 				actualBeat  = 0;
-				if (!suspend) advance();
+				if ( !suspend ) advance();
 			}
 			else
 			if (actualFrame % framesPerBeat == 0 && actualFrame > 0) {
@@ -709,7 +726,8 @@ void Mixer::enterMBreak(int n) {
 		for (int i = 0; i < (int)channels.size; i++ ) {
 			
 			ch = channels.at(i);
-			if (ch->mbreak >= 0 && (ch->status != STATUS_PLAY) ) 
+			if( ch->mbreak >= 0 && ch->status != STATUS_PLAY &&
+			    (ch->type == CHANNEL_MIDI || ((SampleChannel *)ch)->mode & LOOP_ANY) ) {
 				ch->start(0, false);
 			
 		}
@@ -722,7 +740,8 @@ void Mixer::enterMBreak(int n) {
 		ch = channels.at(i);
 		mbreak = ch->mbreak;
 		if (mbreak == n) {
-			if (ch->status != STATUS_PLAY ) 
+			if( ch->status != STATUS_PLAY &&
+			    (ch->type == CHANNEL_MIDI || ((SampleChannel *)ch)->mode & LOOP_ANY ) ) {
 				channels.at(i)->start(0, false);
 		} 
 		else 
