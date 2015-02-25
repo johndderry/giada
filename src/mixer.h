@@ -119,6 +119,11 @@ public:
 
 	void advance();
 
+	/* swapMidiIn
+	 * switch midi recording channel */
+
+	void swapMidiIn(int n);
+
 
 	/* ---------------------------------------------------------------- */
 
