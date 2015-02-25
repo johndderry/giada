@@ -600,7 +600,8 @@ gMidiChannel::gMidiChannel(int X, int Y, int W, int H, class MidiChannel *ch)
 #endif
 
 	button       = new gButton (x(), y(), 20, 20);
-	sampleButton = new gClick (button->x()+button->w()+4, y(), w() - delta, 20, "-- MIDI --");
+	recordButton = new gClick (button->x()+button->w()+4, y(), 20, 20);
+	sampleButton = new gClick (recordbutton->x()+recordbutton->w()+4, y(), w() - delta - 20, 20, "-- MIDI --");
 	mute         = new gClick (sampleButton->x()+sampleButton->w()+4, y(), 20, 20, "", muteOff_xpm, muteOn_xpm);
 	solo         = new gClick (mute->x()+mute->w()+4, y(), 20, 20, "", soloOff_xpm, soloOn_xpm);
 #if defined(WITH_VST)
@@ -629,6 +630,7 @@ gMidiChannel::gMidiChannel(int X, int Y, int W, int H, class MidiChannel *ch)
 	solo->type(FL_TOGGLE_BUTTON);
 	solo->callback(cb_solo, (void*)this);
 
+	recordButton->callback(cb_record, (void*)this);
 	sampleButton->callback(cb_openMenu, (void*)this);
 	vol->callback(cb_changeVol, (void*)this);
 
@@ -640,6 +642,7 @@ gMidiChannel::gMidiChannel(int X, int Y, int W, int H, class MidiChannel *ch)
 
 
 void gMidiChannel::cb_button      (Fl_Widget *v, void *p) { ((gMidiChannel*)p)->__cb_button(); }
+void gMidiChannel::cb_record      (Fl_Widget *v, void *p) { ((gMidiChannel*)p)->__cb_record(); }
 void gMidiChannel::cb_mute        (Fl_Widget *v, void *p) { ((gMidiChannel*)p)->__cb_mute(); }
 void gMidiChannel::cb_solo        (Fl_Widget *v, void *p) { ((gMidiChannel*)p)->__cb_solo(); }
 void gMidiChannel::cb_openMenu    (Fl_Widget *v, void *p) { ((gMidiChannel*)p)->__cb_openMenu(); }
@@ -693,6 +696,15 @@ void gMidiChannel::__cb_button()
 {
 	if (button->value())
 		glue_keyPress(ch, Fl::event_ctrl(), Fl::event_shift());
+}
+
+
+/* ------------------------------------------------------------------ */
+
+
+void gMidiChannel::__cb_record()
+{
+	G_Mixer.swapMidiIn ( ch->index );
 }
 
 
@@ -780,6 +792,13 @@ void gMidiChannel::refresh()
 
 	if (ch->recStatus & (REC_WAITING | REC_ENDING))
 		__gu_blinkChannel(this);    /// TODO - move to gChannel::blink
+
+	if (recorder::active) {
+		if (recorder::canRec(ch)) {
+			sampleButton->bgColor0 = COLOR_BG_4;
+			sampleButton->txtColor = COLOR_TEXT_0;
+		}
+	}
 
 	sampleButton->redraw();
 }
