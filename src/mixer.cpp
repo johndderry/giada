@@ -727,7 +727,7 @@ void Mixer::enterMBreak(int n) {
 			
 			ch = channels.at(i);
 			if( ch->mbreak >= 0 && ch->status != STATUS_PLAY &&
-			    (ch->type == CHANNEL_MIDI || ((SampleChannel *)ch)->mode & LOOP_ANY) ) {
+			    (ch->type == CHANNEL_MIDI || ((SampleChannel *)ch)->mode & LOOP_ANY) )
 				ch->start(0, false);
 			
 		}
