@@ -601,7 +601,7 @@ gMidiChannel::gMidiChannel(int X, int Y, int W, int H, class MidiChannel *ch)
 
 	button       = new gButton (x(), y(), 20, 20);
 	recordButton = new gClick (button->x()+button->w()+4, y(), 20, 20);
-	sampleButton = new gClick (recordbutton->x()+recordbutton->w()+4, y(), w() - delta - 20, 20, "-- MIDI --");
+	sampleButton = new gClick (recordButton->x()+recordButton->w()+4, y(), w() - delta - 20, 20, "-- MIDI --");
 	mute         = new gClick (sampleButton->x()+sampleButton->w()+4, y(), 20, 20, "", muteOff_xpm, muteOn_xpm);
 	solo         = new gClick (mute->x()+mute->w()+4, y(), 20, 20, "", soloOff_xpm, soloOn_xpm);
 #if defined(WITH_VST)
