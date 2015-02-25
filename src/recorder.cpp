@@ -89,6 +89,11 @@ bool canRec(Channel *ch)
 	 * mixer is recording a take in this channel ch
 	 * channel is empty */
 
+        /* first check for midiIn or tunnelIn are false */
+
+	if( !ch->midiIn && !ch->tunnelIn )
+		return 0;
+	
 	if (!active || !G_Mixer.running || G_Mixer.chanInput == ch || (ch->type == CHANNEL_SAMPLE && ((SampleChannel*)ch)->wave == NULL))
 		return 0;
 	return 1;
