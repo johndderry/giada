@@ -70,6 +70,7 @@ public:
 	class gButton *button;
 	class gStatus *status;
 	class gClick  *sampleButton;
+	class gClick  *recordButton;
 	class gDial   *vol;
 	class gClick 	*mute;
 	class gClick 	*solo;
@@ -146,6 +147,7 @@ private:
 	static void cb_solo          (Fl_Widget *v, void *p);
 	static void cb_openMenu      (Fl_Widget *v, void *p);
 	static void cb_changeVol     (Fl_Widget *v, void *p);
+	static void cb_record        (Fl_Widget *v, void *p);
 #ifdef WITH_VST
 	static void cb_openFxWindow  (Fl_Widget *v, void *p);
 #endif
@@ -156,6 +158,7 @@ private:
 	inline void __cb_button      ();
 	inline void __cb_openMenu    ();
 	inline void __cb_readActions ();
+	inline void __cb_record      ();
 #ifdef WITH_VST
 	inline void __cb_openFxWindow();
 #endif
